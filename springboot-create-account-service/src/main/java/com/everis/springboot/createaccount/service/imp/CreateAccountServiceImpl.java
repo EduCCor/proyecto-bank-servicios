@@ -39,7 +39,7 @@ public class CreateAccountServiceImpl implements CreateAccountService {
 	@Value("${everis.create.cantidad.movimientos}")
 	private Integer movMonth;
 
-	@Value("${everis.dia-retiro.plazo-fijo}")
+	@Value("${everis.create.dia-retiro.plazo-fijo}")
 	private Integer diaRetiro;
 
 	@Value("${everis.url.gateway}")
