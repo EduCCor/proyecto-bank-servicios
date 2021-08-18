@@ -29,16 +29,12 @@ public class ClientController {
 	@Autowired
 	private ClientService clientService;
 	
-	@Value("${configuracion.autor.email}")
-	private String email;
-	
 	@PostMapping("/saveClient")
 	public Mono<ResponseEntity<?>> saveClient(@Valid @RequestBody ClientDocument client){
 		System.out.println("Entro al metodo guardar");
 		return clientService.saveClient(client);
 	}
-	
-	
+
 	@GetMapping("/allClients")
 	public Flux<ClientDocument> getAllClients() {
 		return clientService.findClients();
@@ -58,11 +54,5 @@ public class ClientController {
 	public ResponseEntity<String> deleteClient(@PathVariable("id") String id) {
 		return clientService.deleteClient(id);
 	}
-	
-	@GetMapping("/getTextoActuator")
-	public String getTexto() {
-		return email;
-	}
-
 
 }
