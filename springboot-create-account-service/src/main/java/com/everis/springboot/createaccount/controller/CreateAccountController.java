@@ -23,7 +23,6 @@ public class CreateAccountController {
 	
 	@PostMapping("/saveAccount/{id}")
 	public Mono<ResponseEntity<Map<String,Object>>> saveAccount(@PathVariable String id,@Valid @RequestBody CreateAccountDocument document){
-		System.out.println("Entro al metodo guardar cuenta");
 		return accountService.saveAccount(id,document);
 	}
 
