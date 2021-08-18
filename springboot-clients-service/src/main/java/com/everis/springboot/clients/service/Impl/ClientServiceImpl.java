@@ -32,7 +32,7 @@ public class ClientServiceImpl implements ClientService {
 		return clientDao.save(client).map( c -> {
 			response.put("mensaje", "Se registró el cliente correctamente");
 			response.put("cliente", c);
-			LOGGER.info("Client: " + c.getFirst_name() + c.getLast_name() + " Create Successfully!");
+			LOGGER.info("Client: " + c.getFirst_name() + " " + c.getLast_name() + " Create Successfully!");
 			return new ResponseEntity<>(response,HttpStatus.OK);
 		});
 	}
@@ -41,7 +41,7 @@ public class ClientServiceImpl implements ClientService {
 	public Flux<ClientDocument> findClients() {
 		LOGGER.info("Client - Service Search Alls Clients");
 		return clientDao.findAll().doOnNext(c -> {
-			LOGGER.info("Clients:\n" + c.getFirst_name() + c.getLast_name());
+			LOGGER.info("Clients:\n" + c.getFirst_name() + " " + c.getLast_name());
 		});
 	}
 
@@ -49,14 +49,15 @@ public class ClientServiceImpl implements ClientService {
 	public Mono<ClientDocument> findClient(String id) {
 		LOGGER.info("Client - Service Search Client by ID");
 		return clientDao.findById(id).doOnNext(c -> {
-			LOGGER.info("Client: " + c.getFirst_name() + c.getLast_name() + " Found!");
+			LOGGER.info("Client: " + c.getFirst_name() + " " + c.getLast_name() + " Found!");
 		});
 	}
 
 	@Override
 	public Mono<ResponseEntity<Map<String,Object>>> updateClient(String id, ClientDocument client) {
 		Map<String, Object> response = new HashMap<>();
-	
+		LOGGER.info("Client - Service Update Client");
+
 		return clientDao.findById(id).flatMap(c -> {
 			c.setFirst_name(client.getFirst_name());
 			c.setLast_name(client.getLast_name());
@@ -65,7 +66,7 @@ public class ClientServiceImpl implements ClientService {
 		}).map(clientUpdated -> {
 			response.put("mensaje", "Se actualizó el cliente correctamente");
 			response.put("client", clientUpdated);
-			LOGGER.info("Client: " + clientUpdated.getFirst_name() + clientUpdated.getLast_name() + " Updated Successfully!");
+			LOGGER.info("Client: " + clientUpdated.getFirst_name() + " " + clientUpdated.getLast_name() + " Updated Successfully!");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}).defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 			
@@ -73,10 +74,12 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public ResponseEntity<String> deleteClient(String id) {
+		LOGGER.info("Client - Service Delete Client");
+
 		try {
 			//clientDao.deleteById(id).subscribe();
 			clientDao.findById(id).flatMap(c -> {
-				LOGGER.info("Client: " + c.getFirst_name() + c.getLast_name() + " Deleted Successfully !");
+				LOGGER.info("Client: " + c.getFirst_name() + " " + c.getLast_name() + " Deleted Successfully !");
 				return clientDao.deleteById(c.getId());
 			}).subscribe();
 		} catch (Exception e) {

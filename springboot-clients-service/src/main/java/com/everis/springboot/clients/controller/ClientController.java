@@ -31,7 +31,6 @@ public class ClientController {
 	
 	@PostMapping("/saveClient")
 	public Mono<ResponseEntity<?>> saveClient(@Valid @RequestBody ClientDocument client){
-		System.out.println("Entro al metodo guardar");
 		return clientService.saveClient(client);
 	}
 
