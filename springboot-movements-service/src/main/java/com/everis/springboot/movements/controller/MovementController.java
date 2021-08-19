@@ -3,9 +3,7 @@ package com.everis.springboot.movements.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.everis.springboot.movements.documents.MovementDocument;
 import com.everis.springboot.movements.service.MovementService;
@@ -22,6 +20,12 @@ public class MovementController {
 	public Mono<MovementDocument> saveMovement(@Valid @RequestBody MovementDocument movement){
 		System.out.println("Entro al metodo guardar cuenta");
 		return movementService.saveMovement(movement);
+	}
+
+	@GetMapping("/numberOfMovements")
+	public Mono<Long> numberOfMovements(@RequestParam(name="idCuenta") String idCuenta){
+		System.out.println("Entro al metodo guardar cuenta");
+		return movementService.getNumberOfMovements(idCuenta);
 	}
 
 }

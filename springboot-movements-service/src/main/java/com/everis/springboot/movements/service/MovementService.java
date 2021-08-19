@@ -8,4 +8,6 @@ public interface MovementService {
 	
 	Mono<MovementDocument> saveMovement(MovementDocument movement);
 
+	Mono<Long> getNumberOfMovements(String idCuenta);
+
 }
