@@ -10,16 +10,18 @@ import java.util.Map;
 
 public interface SavingService {
 
-    Mono<ResponseEntity<Map<String,Object>>> saveSaving(String id, SavingDocument saving);
+    Flux<SavingDocument> getAllSavingAccount();
 
-    Flux<SavingDocument> findSavingsByProduct(String id);
+    Mono<SavingDocument> save(SavingDocument saving);
 
-//    Mono<SavingDocument> findSavingsById(String id);
+    Mono<SavingDocument> findById(String idSavingDocument);
 
-    Mono<SavingDocument> findSaving(String id);
+    Mono<Void> deleteById(String idSavingDocument);
 
-    Mono<ResponseEntity<Map<String,Object>>> updateSaving(String id,SavingDocument saving);
+    Mono<ResponseEntity<Map<String,Object>>> consultarSaldo(String idSavingDocument);
 
-    ResponseEntity<String> deleteSaving(String id);
+    Mono<ResponseEntity<Map<String,Object>>> retirar(String idSavingDocument,Double cant);
+
+    Mono<ResponseEntity<Map<String,Object>>> depositar(String idSavingDocument,Double cant);
 
 }

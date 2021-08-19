@@ -23,5 +23,5 @@ public class CreditDocument {
 
     private String createCredit;
 
-    private String paidCredit;
+    private Double paidCredit;
 }

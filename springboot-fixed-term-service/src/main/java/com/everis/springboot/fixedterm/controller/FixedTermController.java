@@ -42,4 +42,9 @@ public class FixedTermController {
 		return fixedTermService.consultarSaldo(id);
 	}
 
+	@GetMapping("/getAccount/{id}")
+	public Mono<FixedTermDocument> getAccountFixed(@PathVariable("id") String id){
+		return fixedTermService.obtenerCuenta(id);
+	}
+
 }

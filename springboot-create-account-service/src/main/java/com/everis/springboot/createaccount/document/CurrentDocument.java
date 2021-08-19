@@ -24,4 +24,6 @@ public class CurrentDocument {
     private String type;
 
     private Date createCurrent;
+
+    private Date modifiedCurrent;
 }

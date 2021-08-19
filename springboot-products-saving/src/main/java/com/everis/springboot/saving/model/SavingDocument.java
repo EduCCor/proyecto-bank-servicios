@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -15,11 +17,15 @@ public class SavingDocument {
     @Id
     private String id;
 
-    private int limitMov;
+    private double amountSaving;
 
-    private String commission;
+    private String idClient;
 
-    private String client;
+    private int movMonthSaving;
 
-    private String product;
+    private String type;
+
+    private Date createSaving;
+
+    private Date modifiedSaving;
 }

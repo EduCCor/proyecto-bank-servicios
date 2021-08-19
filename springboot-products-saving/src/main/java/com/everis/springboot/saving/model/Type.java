@@ -3,15 +3,13 @@ package com.everis.springboot.saving.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductTypeDocument {
+@Data
+public class Type {
 
-    @Id
-    private String id;
+    private int id;
 
-    private String description;
+    private String descripcion;
 }

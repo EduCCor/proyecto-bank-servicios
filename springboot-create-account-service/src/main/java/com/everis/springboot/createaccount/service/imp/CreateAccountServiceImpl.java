@@ -42,7 +42,7 @@ public class CreateAccountServiceImpl implements CreateAccountService {
 	@Value("${everis.create.dia-retiro.plazo-fijo}")
 	private Integer diaRetiro;
 
-	@Value("${everis.url.gateway}")
+	@Value("${everis.create.url.gateway}")
 	private String urlGateway;
 
 	@Override

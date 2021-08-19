@@ -34,7 +34,13 @@ public class FixedTermServiceImpl implements FixedTermService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FixedTermServiceImpl.class);
 
-	@Value("${everis.url.gateway}")
+	@Value("${everis.fixed.cantidad.movimientos}")
+	private Integer amountOfMovements;
+
+	@Value("${everis.fixed.comision.movimientos}")
+	private double comissionPerMovement;
+
+	@Value("${everis.fixed.url.gateway}")
 	private String urlGateway;
 
 	@Override
@@ -50,39 +56,72 @@ public class FixedTermServiceImpl implements FixedTermService {
 		Calendar calendar = Calendar.getInstance();
 		DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy hh:mm:ss");
 		LOGGER.info("Empezo el Deposito");
-		
-		return fixedTermDao.findById(idCuenta).flatMap( c -> {
-			c.setSaldo(c.getSaldo() + cantidad);
-			
-			if(calendar.get(Calendar.DAY_OF_MONTH) == c.getDiaRetiro()) {
-				
-				return fixedTermDao.save(c).flatMap(acc -> {
-					Date date = Calendar.getInstance().getTime();
-					MovementDocument movement = MovementDocument.builder()
-							.tipoMovimiento("Deposito")
-							.tipoProducto("Cuenta Plazo Fijo")
-							.fechaMovimiento(dateFormat.format(date))
-							.idCuenta(idCuenta)
-							.idCliente(acc.getIdCliente())
-							.build();
-					
-					webClientBuilder.build().post()
-					.uri(urlGateway + "/api/movement/saveMovement")
-					.body(Mono.just(movement), MovementDocument.class)
-					.retrieve().bodyToMono(MovementDocument.class).subscribe();
-					
-					
-					response.put("mensaje", "Se hizo el deposito exitosamente");
-					response.put("cuenta", acc);
-					LOGGER.info("Se hizo el deposito exitosamente");
-					return Mono.just(new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK));
+
+		return webClientBuilder.build().get()
+				.uri(urlGateway+"/api/movement/numberOfMovements?idCuenta=" + idCuenta)
+				.retrieve().bodyToMono(Long.class).flatMap(number -> {
+					if (number<=amountOfMovements) {
+						return fixedTermDao.findById(idCuenta).flatMap( c -> {
+							c.setSaldo(c.getSaldo() + cantidad);
+
+							if(calendar.get(Calendar.DAY_OF_MONTH) == c.getDiaRetiro()) {
+								return fixedTermDao.save(c).flatMap(acc -> {
+									Date date = Calendar.getInstance().getTime();
+									MovementDocument movement = MovementDocument.builder()
+											.tipoMovimiento("Deposito")
+											.tipoProducto("Cuenta Plazo Fijo")
+											.fechaMovimiento(dateFormat.format(date))
+											.idCuenta(idCuenta)
+											.idCliente(acc.getIdCliente())
+											.build();
+
+									webClientBuilder.build().post()
+											.uri(urlGateway+"/api/movement/saveMovement")
+											.body(Mono.just(movement), MovementDocument.class)
+											.retrieve().bodyToMono(MovementDocument.class).subscribe();
+
+
+									response.put("mensaje", "Se hizo el deposito exitosamente");
+									response.put("cuenta", acc);
+									return Mono.just(new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK));
+								});
+							}else{
+								response.put("mensaje", "No puede depositar porque no es el dia establecido");
+								return Mono.just(new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK));
+							}
+						}).defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+					}else{
+						return fixedTermDao.findById(idCuenta).flatMap( c -> {
+							c.setSaldo(c.getSaldo() + cantidad - comissionPerMovement);
+							if(calendar.get(Calendar.DAY_OF_MONTH) == c.getDiaRetiro()) {
+								return fixedTermDao.save(c).flatMap(acc -> {
+									Date date = Calendar.getInstance().getTime();
+									MovementDocument movement = MovementDocument.builder()
+											.tipoMovimiento("Deposito")
+											.comission(comissionPerMovement)
+											.tipoProducto("Cuenta Plazo Fijo")
+											.fechaMovimiento(dateFormat.format(date))
+											.idCuenta(idCuenta)
+											.idCliente(acc.getIdCliente())
+											.build();
+
+									webClientBuilder.build().post()
+											.uri(urlGateway+"/api/movement/saveMovement")
+											.body(Mono.just(movement), MovementDocument.class)
+											.retrieve().bodyToMono(MovementDocument.class).subscribe();
+
+
+									response.put("mensaje", "Se hizo el deposito exitosamente");
+									response.put("cuenta", acc);
+									return Mono.just(new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK));
+								});
+							}else{
+								response.put("mensaje", "No puede depositar porque no es el dia establecido");
+								return Mono.just(new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK));
+							}
+						}).defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+					}
 				});
-			}else {
-				response.put("mensaje", "No puede depositar porque no es el dia establecido");
-				LOGGER.info("No puede depositar porque no es el dia establecido");
-				return Mono.just(new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK));
-			}
-		}).defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@Override
@@ -145,7 +184,11 @@ public class FixedTermServiceImpl implements FixedTermService {
 			
 		}).defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
-	
-	
+
+	@Override
+	public Mono<FixedTermDocument> obtenerCuenta(String idCliente) {
+		return fixedTermDao.findById(idCliente);
+	}
+
 
 }

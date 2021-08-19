@@ -24,4 +24,6 @@ public class SavingDocument {
     private String type;
 
     private Date createSaving;
+
+    private Date modifiedSaving;
 }
