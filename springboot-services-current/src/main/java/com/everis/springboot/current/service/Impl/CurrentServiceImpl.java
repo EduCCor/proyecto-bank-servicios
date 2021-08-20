@@ -59,7 +59,7 @@ public class CurrentServiceImpl implements CurrentService {
 
     @Override
     public Flux<CurrentDocument> findByClientId(String clientId) {
-        Flux<CurrentDocument> lcurrentDocument = currentDao.findByClientId(clientId) ;
+        Flux<CurrentDocument> lcurrentDocument = currentDao.findByIdClient(clientId) ;
         return lcurrentDocument;
     }
 

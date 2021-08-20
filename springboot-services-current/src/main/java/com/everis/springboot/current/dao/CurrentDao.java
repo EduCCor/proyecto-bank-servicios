@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 
 public interface CurrentDao extends ReactiveMongoRepository<CurrentDocument, String> {
-    Flux<CurrentDocument> findByClientId(String idClient);
+    Flux<CurrentDocument> findByIdClient(String idClient);
 }

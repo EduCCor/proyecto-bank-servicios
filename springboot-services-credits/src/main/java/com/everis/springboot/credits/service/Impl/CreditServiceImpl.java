@@ -60,7 +60,7 @@ public class CreditServiceImpl implements CreditService {
 
                 if(c.getClient_type().getDescription().equals("Personal") || c.getClient_type().getDescription().equals("VIP")) {
                     for (CreditDocument cre : credits) {
-                        if(cre.getCreditType().equals("Credito Personal")) {
+                        if(cre.getCreditType().equals("Credito")) {
                             creditAccount++;
                         }
                         if(cre.getCreditType().equals("Tarjeta de Credito")) {

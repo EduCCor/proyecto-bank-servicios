@@ -112,12 +112,12 @@ public class CreateAccountServiceImpl implements CreateAccountService {
 					
 				}else if(Arrays.asList("Empresarial", "PYME").contains(c.getClient_type().getDescription())) {
 					if(account.getAccount_type().equals("Cuenta de Ahorro")) {
-						response.put("mensaje", "Un usuario empresarial no puede tener cuenta de ahorro");
+						response.put("mensaje", "Un usuario empresarial o PYME no puede tener cuenta de ahorro");
 						LOGGER.info("Un usuario empresarial no puede tener cuenta de ahorro");
 						return Mono.just(new ResponseEntity<Map<String,Object>>(response,HttpStatus.BAD_REQUEST));
 					}
 					if(account.getAccount_type().equals("Cuenta Plazo Fijo")) {
-						response.put("mensaje", "Un usuario empresarial no puede tener cuenta a plazo fijo");
+						response.put("mensaje", "Un usuario empresarial o PYME no puede tener cuenta a plazo fijo");
 						LOGGER.info("Un usuario empresarial no puede tener cuenta a plazo fijo");
 						return Mono.just(new ResponseEntity<Map<String,Object>>(response,HttpStatus.BAD_REQUEST));
 					}
