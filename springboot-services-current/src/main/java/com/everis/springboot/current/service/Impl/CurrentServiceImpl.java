@@ -92,7 +92,7 @@ public class CurrentServiceImpl implements CurrentService {
                                 MovementDocument movement = MovementDocument.builder()
                                         .tipoMovimiento("Deposito")
                                         .tipoProducto("Cuenta Corriente")
-                                        .fechaMovimiento(dateFormat.format(date))
+                                        .fechaMovimiento(date)
                                         .idCuenta(idCuenta)
                                         .idCliente(acc.getIdClient())
                                         .build();
@@ -117,7 +117,7 @@ public class CurrentServiceImpl implements CurrentService {
                                 MovementDocument movement = MovementDocument.builder()
                                         .tipoMovimiento("Deposito")
                                         .tipoProducto("Cuenta Corriente")
-                                        .fechaMovimiento(dateFormat.format(date))
+                                        .fechaMovimiento(date)
                                         .comission(comissionPerMovement)
                                         .idCuenta(idCuenta)
                                         .idCliente(acc.getIdClient())
@@ -164,7 +164,7 @@ public class CurrentServiceImpl implements CurrentService {
                                     MovementDocument movement = MovementDocument.builder()
                                             .tipoMovimiento("Retiro")
                                             .tipoProducto("Cuenta Corriente")
-                                            .fechaMovimiento(dateFormat.format(date))
+                                            .fechaMovimiento(date)
                                             .idCuenta(idCuenta)
                                             .idCliente(acc.getIdClient())
                                             .build();
@@ -200,7 +200,7 @@ public class CurrentServiceImpl implements CurrentService {
                                             .tipoMovimiento("Retiro")
                                             .tipoProducto("Cuenta Corriente")
                                             .comission(comissionPerMovement)
-                                            .fechaMovimiento(dateFormat.format(date))
+                                            .fechaMovimiento(date)
                                             .idCuenta(idCuenta)
                                             .idCliente(acc.getIdClient())
                                             .build();
@@ -237,5 +237,37 @@ public class CurrentServiceImpl implements CurrentService {
     @Override
     public Mono<CurrentDocument> getCurrentAccount(String idAccount) {
         return currentDao.findById(idAccount);
+    }
+
+    @Override
+    public Mono<Boolean> payWithDebitCard(String idAccount, Double mount) {
+        return currentDao.findById(idAccount).flatMap( c -> {
+
+            if(c.getAmountCurrent() - mount < 0) {
+                return Mono.just(false);
+            }else {
+                c.setAmountCurrent(c.getAmountCurrent() - mount);
+
+                return currentDao.save(c).flatMap(acc -> {
+
+                    Date date = Calendar.getInstance().getTime();
+                    MovementDocument movement = MovementDocument.builder()
+                            .tipoMovimiento("Pago Tarjeta Debito")
+                            .tipoProducto("Cuenta Corriente")
+                            .fechaMovimiento(date)
+                            .idCuenta(idAccount)
+                            .idCliente(acc.getIdClient())
+                            .build();
+
+                    return webClientBuilder.build().post()
+                            .uri(urlGateway+"/api/movement/saveMovement")
+                            .body(Mono.just(movement), MovementDocument.class)
+                            .retrieve().bodyToMono(MovementDocument.class).flatMap( md -> {
+                                return Mono.just(true);
+                            });
+                });
+            }
+
+        });
     }
 }

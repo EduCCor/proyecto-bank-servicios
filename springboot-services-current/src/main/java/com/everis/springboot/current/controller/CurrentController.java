@@ -110,4 +110,9 @@ public class CurrentController {
     public Mono<ResponseEntity<Map<String,Object>>> getBalance(@PathVariable("id") String id) {
         return currentService.consultarSaldo(id);
     }
+
+    @GetMapping("/payWithDebit/{idAccount}/{mount}")
+    public Mono<Boolean> payWithDebitCard(@PathVariable String idAccount,@PathVariable Double mount) {
+        return currentService.payWithDebitCard(idAccount,mount);
+    }
 }

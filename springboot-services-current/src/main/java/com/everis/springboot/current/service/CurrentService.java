@@ -28,4 +28,6 @@ public interface CurrentService {
     Mono<ResponseEntity<Map<String,Object>>> consultarSaldo(String idCliente);
 
     Mono<CurrentDocument> getCurrentAccount(String idAccount);
+
+    Mono<Boolean> payWithDebitCard(String idAccount, Double mount);
 }
