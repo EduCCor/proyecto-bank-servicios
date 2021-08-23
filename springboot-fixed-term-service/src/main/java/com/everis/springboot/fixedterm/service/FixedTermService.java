@@ -16,8 +16,10 @@ public interface FixedTermService {
 	
 	Mono<ResponseEntity<Map<String,Object>>> retirar(String idCuenta,Double cantidad);
 	
-	Mono<ResponseEntity<Map<String,Object>>> consultarSaldo(String idCliente);
+	Mono<ResponseEntity<Map<String,Object>>> consultarSaldo(String idAccount);
 
 	Mono<FixedTermDocument> obtenerCuenta(String idCliente);
+
+	Mono<Boolean> payWithDebitCard(String idAccount, Double mount);
 
 }

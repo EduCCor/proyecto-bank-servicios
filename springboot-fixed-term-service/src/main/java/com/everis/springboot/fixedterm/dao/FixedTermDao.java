@@ -7,6 +7,6 @@ import reactor.core.publisher.Mono;
 
 public interface FixedTermDao extends ReactiveMongoRepository<FixedTermDocument, String>{
 	
-	Mono<FixedTermDocument> findByIdCliente(String client);
+//	Mono<FixedTermDocument> findByIdCliente(String client);
 
 }

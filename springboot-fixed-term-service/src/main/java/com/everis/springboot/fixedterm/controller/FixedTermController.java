@@ -47,4 +47,9 @@ public class FixedTermController {
 		return fixedTermService.obtenerCuenta(id);
 	}
 
+	@GetMapping("/payWithDebit/{idAccount}/{mount}")
+	public Mono<Boolean> payWithDebitCard(@PathVariable String idAccount,@PathVariable Double mount) {
+		return fixedTermService.payWithDebitCard(idAccount,mount);
+	}
+
 }

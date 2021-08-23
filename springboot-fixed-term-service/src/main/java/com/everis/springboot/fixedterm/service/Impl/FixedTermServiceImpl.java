@@ -70,7 +70,7 @@ public class FixedTermServiceImpl implements FixedTermService {
 									MovementDocument movement = MovementDocument.builder()
 											.tipoMovimiento("Deposito")
 											.tipoProducto("Cuenta Plazo Fijo")
-											.fechaMovimiento(dateFormat.format(date))
+											.fechaMovimiento(date)
 											.idCuenta(idCuenta)
 											.idCliente(acc.getIdCliente())
 											.build();
@@ -100,7 +100,7 @@ public class FixedTermServiceImpl implements FixedTermService {
 											.tipoMovimiento("Deposito")
 											.comission(comissionPerMovement)
 											.tipoProducto("Cuenta Plazo Fijo")
-											.fechaMovimiento(dateFormat.format(date))
+											.fechaMovimiento(date)
 											.idCuenta(idCuenta)
 											.idCliente(acc.getIdCliente())
 											.build();
@@ -147,7 +147,7 @@ public class FixedTermServiceImpl implements FixedTermService {
 						MovementDocument movement = MovementDocument.builder()
 								.tipoMovimiento("Retiro")
 								.tipoProducto("Cuenta Plazo Fijo")
-								.fechaMovimiento(dateFormat.format(date))
+								.fechaMovimiento(date)
 								.idCuenta(idCuenta)
 								.idCliente(acc.getIdCliente())
 								.build();
@@ -172,11 +172,11 @@ public class FixedTermServiceImpl implements FixedTermService {
 	}
 
 	@Override
-	public Mono<ResponseEntity<Map<String, Object>>> consultarSaldo(String idCliente) {
+	public Mono<ResponseEntity<Map<String, Object>>> consultarSaldo(String idAccount) {
 		Map<String, Object> response = new HashMap<>();
 		LOGGER.info("Esta Consultando Saldo");
 		
-		return fixedTermDao.findByIdCliente(idCliente).flatMap( c -> {
+		return fixedTermDao.findById(idAccount).flatMap( c -> {
 
 			response.put("mensaje", "El saldo de la cuenta es: S/."+c.getSaldo());
 			LOGGER.info("El saldo de la cuenta es: S/." + c.getSaldo());
@@ -188,6 +188,40 @@ public class FixedTermServiceImpl implements FixedTermService {
 	@Override
 	public Mono<FixedTermDocument> obtenerCuenta(String idCliente) {
 		return fixedTermDao.findById(idCliente);
+	}
+
+	@Override
+	public Mono<Boolean> payWithDebitCard(String idAccount, Double mount) {
+		return fixedTermDao.findById(idAccount).flatMap( c -> {
+
+			if(c.getAmountFixed() - mount < 0) {
+				return Mono.just(false);
+			}else {
+				c.setAmountFixed(c.getAmountFixed() - mount);
+
+				return fixedTermDao.save(c).flatMap(acc -> {
+
+					Date date = Calendar.getInstance().getTime();
+					MovementDocument movement = MovementDocument.builder()
+							.tipoMovimiento("Pago Tarjeta Debito")
+							.tipoProducto("Cuenta Plazo Fijo")
+							.fechaMovimiento(date)
+							.idCuenta(idAccount)
+							.idCliente(acc.getIdCliente())
+							.build();
+
+					return webClientBuilder.build().post()
+							.uri(urlGateway+"/api/movement/saveMovement")
+							.body(Mono.just(movement), MovementDocument.class)
+							.retrieve().bodyToMono(MovementDocument.class).flatMap( md -> {
+								return Mono.just(true);
+							});
+
+
+				});
+			}
+
+		});
 	}
 
 
