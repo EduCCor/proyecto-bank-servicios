@@ -24,6 +24,11 @@ public class CurrentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentController.class);
 
+    @GetMapping("/getAccount/{idAccount}")
+    public Mono<CurrentDocument> getCurrentAccount(@PathVariable String idAccount) {
+        return currentService.getCurrentAccount(idAccount);
+    }
+
     @GetMapping()
     public Flux<CurrentDocument> getAllCurrentAccount() {
 

@@ -233,4 +233,9 @@ public class CurrentServiceImpl implements CurrentService {
 
         }).defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+    @Override
+    public Mono<CurrentDocument> getCurrentAccount(String idAccount) {
+        return currentDao.findById(idAccount);
+    }
 }
