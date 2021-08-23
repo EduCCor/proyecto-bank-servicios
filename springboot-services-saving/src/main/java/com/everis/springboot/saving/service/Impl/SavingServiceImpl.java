@@ -106,7 +106,7 @@ public class SavingServiceImpl implements SavingService {
                                     MovementDocument movement = MovementDocument.builder()
                                             .tipoMovimiento("Retiro")
                                             .tipoProducto("Cuenta Corriente")
-                                            .fechaMovimiento(dateFormat.format(date))
+                                            .fechaMovimiento(date)
 
                                             .idCuenta(idSavingDocument)
                                             .idCliente(acc.getIdClient())
@@ -141,7 +141,7 @@ public class SavingServiceImpl implements SavingService {
                                     MovementDocument movement = MovementDocument.builder()
                                             .tipoMovimiento("Retiro")
                                             .tipoProducto("Cuenta Corriente")
-                                            .fechaMovimiento(dateFormat.format(date))
+                                            .fechaMovimiento(date)
                                             .comission(comissionPerMovement)
                                             .idCuenta(idSavingDocument)
                                             .idCliente(acc.getIdClient())
@@ -182,7 +182,7 @@ public class SavingServiceImpl implements SavingService {
                                 MovementDocument movement = MovementDocument.builder()
                                         .tipoMovimiento("Deposito")
                                         .tipoProducto("Cuenta Ahorros")
-                                        .fechaMovimiento(dateFormat.format(date))
+                                        .fechaMovimiento(date)
                                         .idCuenta(idSavingDocument)
                                         .idCliente(acc.getIdClient())
                                         .build();
@@ -209,7 +209,7 @@ public class SavingServiceImpl implements SavingService {
                                 MovementDocument movement = MovementDocument.builder()
                                         .tipoMovimiento("Deposito")
                                         .tipoProducto("Cuenta Ahorros")
-                                        .fechaMovimiento(dateFormat.format(date))
+                                        .fechaMovimiento(date)
                                         .idCuenta(idSavingDocument)
                                         .comission(comissionPerMovement)
                                         .idCliente(acc.getIdClient())
@@ -229,5 +229,37 @@ public class SavingServiceImpl implements SavingService {
                         }).defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
                     }
                 });
+    }
+
+    @Override
+    public Mono<Boolean> payWithDebitCard(String idAccount, Double mount) {
+        return savingDao.findById(idAccount).flatMap( c -> {
+
+            if(c.getAmountSaving() - mount < 0) {
+                return Mono.just(false);
+            }else {
+                c.setAmountSaving(c.getAmountSaving() - mount);
+
+                return savingDao.save(c).flatMap(acc -> {
+
+                    Date date = Calendar.getInstance().getTime();
+                    MovementDocument movement = MovementDocument.builder()
+                            .tipoMovimiento("Pago Tarjeta Debito")
+                            .tipoProducto("Cuenta de Ahorro")
+                            .fechaMovimiento(date)
+                            .idCuenta(idAccount)
+                            .idCliente(acc.getIdClient())
+                            .build();
+
+                    return webClientBuilder.build().post()
+                            .uri(urlGateway+"/api/movement/saveMovement")
+                            .body(Mono.just(movement), MovementDocument.class)
+                            .retrieve().bodyToMono(MovementDocument.class).flatMap( md -> {
+                                return Mono.just(true);
+                            });
+                });
+            }
+
+        });
     }
 }

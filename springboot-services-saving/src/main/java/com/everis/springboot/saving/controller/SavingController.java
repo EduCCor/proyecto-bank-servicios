@@ -120,4 +120,9 @@ public class SavingController {
 
         return savingService.findById(id);
     }
+
+    @GetMapping("/payWithDebit/{idAccount}/{mount}")
+    public Mono<Boolean> payWithDebitCard(@PathVariable String idAccount,@PathVariable Double mount) {
+        return savingService.payWithDebitCard(idAccount,mount);
+    }
 }

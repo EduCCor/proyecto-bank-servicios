@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -17,7 +19,7 @@ public class MovementDocument {
 
     private String tipoProducto;
 
-    private String fechaMovimiento;
+    private Date fechaMovimiento;
 
     private double comission;
 

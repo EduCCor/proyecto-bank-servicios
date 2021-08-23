@@ -21,4 +21,6 @@ public interface SavingService {
     Mono<ResponseEntity<Map<String,Object>>> retirar(String idSavingDocument,Double cant);
 
     Mono<ResponseEntity<Map<String,Object>>> depositar(String idSavingDocument,Double cant);
+
+    Mono<Boolean> payWithDebitCard(String idAccount, Double mount);
 }
